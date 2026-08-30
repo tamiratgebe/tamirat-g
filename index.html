@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tamirat Gebeyehu Bekele - Interactive Portfolio</title>
+  <style>
+    :root {
+      --bg-color: #08121e;
+      --card-bg: #112236;
+      --sidebar-bg: #0b1a2d;
+      --accent: #06b6d4;
+      --accent-glow: rgba(6, 182, 212, 0.4);
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #1e3a5f;
+      --modal-bg: rgba(8, 18, 30, 0.95);
+      --error-color: #ef4444;
+    }
+
+    [data-theme="light"] {
+      --bg-color: #f0f9ff;
+      --card-bg: #ffffff;
+      --sidebar-bg: #e0f2fe;
+      --accent: #0284c7;
+      --accent-glow: rgba(2, 132, 199, 0.3);
+      --text: #0f172a;
+      --text-muted: #475569;
+      --border: #bae6fd;
+      --modal-bg: rgba(240, 249, 255, 0.95);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body {
+      background-color: var(--bg-color);
+      background-image:
+        linear-gradient(rgba(148, 163, 184, 0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(148, 163, 184, 0.045) 1px, transparent 1px),
+        radial-gradient(circle at 78% 12%, rgba(6, 182, 212, 0.16), transparent 30%),
+        radial-gradient(circle at 18% 86%, rgba(30, 64, 175, 0.13), transparent 32%),
+        linear-gradient(135deg, #08121e 0%, #0b1a2d 52%, #07111d 100%);
+      background-size: 42px 42px, 42px 42px, auto, auto, auto;
+      background-attachment: fixed;
+      color: var(--text); line-height: 1.6; display: flex;
+      transition: background-color 0.4s, color 0.4s;
+    }
+
+    body[data-theme="light"] {
+      background-image:
+        linear-gradient(rgba(14, 116, 144, 0.055) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(14, 116, 144, 0.055) 1px, transparent 1px),
+        radial-gradient(circle at 78% 12%, rgba(6, 182, 212, 0.14), transparent 30%),
+        radial-gradient(circle at 18% 86%, rgba(14, 116, 144, 0.1), transparent 32%),
+        linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 52%, #f8fafc 100%);
+    }
+
+    #bg-canvas {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;
+      pointer-events: none; opacity: 0.85;
+    }
+
+    main { position: relative; z-index: 1; }
+
+    aside {
+      width: 280px; height: 100vh; position: fixed; top: 0; left: 0;
+      background: var(--sidebar-bg); border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; align-items: center; padding: 2.5rem 1.5rem;
+      z-index: 1000; box-shadow: 5px 0 20px rgba(0,0,0,0.2); transition: background-color 0.4s;
+    }
+
+    .profile-img-container {
+      width: 130px; height: 130px; border-radius: 50%; border: 3px solid var(--accent);
+      padding: 4px; margin-bottom: 1.2rem; box-shadow: 0 0 20px var(--accent-glow); transition: transform 0.3s;
+    }
+    .profile-img-container:hover { transform: scale(1.05); }
+    .profile-img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; background-color: var(--card-bg); }
+
+    .sidebar-name { font-size: 1.2rem; font-weight: 700; color: var(--text); text-align: center; margin-bottom: 0.3rem; }
+    .sidebar-title { font-size: 0.85rem; color: var(--accent); text-align: center; font-weight: 600; margin-bottom: 0.5rem; }
+    .sidebar-email { font-size: 0.78rem; color: var(--text-muted); text-align: center; word-break: break-all; margin-bottom: 1.5rem; }
+    .sidebar-email a { color: var(--text-muted); text-decoration: none; transition: color 0.3s; }
+    .sidebar-email a:hover { color: var(--accent); }
+
+    .nav-links { list-style: none; width: 100%; margin-bottom: auto; }
+    .nav-links li { margin-bottom: 0.8rem; }
+    .nav-links a {
+      display: block; width: 100%; padding: 0.7rem 1rem; color: var(--text-muted);
+      text-decoration: none; border-radius: 8px; font-size: 0.95rem; font-weight: 500;
+      transition: all 0.3s; border: 1px solid transparent;
+    }
+    .nav-links a:hover {
+      color: var(--accent); background: rgba(6, 182, 212, 0.1);
+      border-color: var(--accent); transform: translateX(5px);
+    }
+
+    .theme-toggle {
+      background: var(--card-bg); border: 1px solid var(--border); color: var(--accent);
+      padding: 0.5rem 1rem; border-radius: 20px; cursor: pointer; font-size: 0.85rem; font-weight: 600;
+      transition: all 0.3s; display: flex; align-items: center; gap: 0.5rem; width: 100%; justify-content: center;
+    }
+    .theme-toggle:hover { transform: scale(1.03); box-shadow: 0 0 12px var(--accent-glow); }
+
+    main { margin-left: 280px; width: calc(100% - 280px); padding: 3rem 4rem; }
+
+    .hero { min-height: 75vh; display: flex; flex-direction: column; justify-content: center; max-width: 850px; }
+    .hero h1 { font-size: 3.2rem; color: var(--text); margin-bottom: 0.8rem; line-height: 1.2; }
+    .hero h2 { font-size: 1.3rem; color: var(--accent); font-weight: 600; margin-bottom: 1.2rem; }
+    .hero p { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 2rem; }
+    
+    .btn-group { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .btn {
+      display: inline-block; padding: 0.8rem 1.8rem; background: var(--accent); color: #08121e;
+      border-radius: 6px; font-weight: 700; text-decoration: none; transition: all 0.3s;
+      box-shadow: 0 0 15px var(--accent-glow); width: fit-content; border: none; cursor: pointer;
+    }
+    .btn:hover { transform: translateY(-3px); box-shadow: 0 0 25px var(--accent-glow); }
+    
+    .btn-outline {
+      background: transparent; color: var(--accent); border: 1px solid var(--accent);
+      box-shadow: none;
+    }
+    .btn-outline:hover { background: rgba(6, 182, 212, 0.1); color: var(--accent); }
+
+    section { max-width: 950px; padding: 4rem 0; }
+    .section-title { font-size: 1.8rem; margin-bottom: 2rem; border-left: 4px solid var(--accent); padding-left: 1rem; }
+
+    .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; }
+    .skill-card { background: var(--card-bg); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border); transition: transform 0.3s; }
+    .skill-card:hover { transform: translateY(-5px); border-color: var(--accent); }
+    .skill-card h3 { color: var(--accent); margin-bottom: 0.8rem; }
+    .skill-card ul { list-style: none; color: var(--text-muted); font-size: 0.95rem; }
+    .skill-card li { margin-bottom: 0.4rem; }
+
+    .filter-buttons { display: flex; gap: 0.8rem; margin-bottom: 2rem; flex-wrap: wrap; }
+    .filter-btn { background: var(--card-bg); border: 1px solid var(--border); color: var(--text-muted); padding: 0.5rem 1.2rem; border-radius: 20px; cursor: pointer; transition: all 0.3s; }
+    .filter-btn.active, .filter-btn:hover { background: var(--accent); color: #08121e; font-weight: 700; box-shadow: 0 0 10px var(--accent-glow); }
+
+    .projects-grid, .cert-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.8rem; }
+    
+    .project-card {
+      background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border);
+      overflow: hidden; display: flex; flex-direction: column; justify-content: space-between;
+      padding: 1.5rem; transition: all 0.3s;
+    }
+    .project-card:hover { border-color: var(--accent); box-shadow: 0 10px 25px -5px var(--accent-glow); }
+    
+    .cert-card {
+      background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border);
+      overflow: hidden; display: flex; flex-direction: column; justify-content: space-between;
+      padding: 1.5rem; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.4s, box-shadow 0.4s;
+      position: relative; cursor: pointer; z-index: 1;
+    }
+
+    .cert-card::before {
+      content: ''; position: absolute; top: var(--mouse-y, 50%); left: var(--mouse-x, 50%);
+      width: 0px; height: 0px; background: radial-gradient(circle, rgba(6, 182, 212, 0.35) 0%, rgba(6, 182, 212, 0.05) 50%, transparent 70%);
+      border-radius: 50%; transform: translate(-50%, -50%); transition: width 0.6s ease-out, height 0.6s ease-out;
+      pointer-events: none; z-index: -1; filter: blur(10px);
+    }
+
+    .cert-card:hover::before {
+      width: 380px; height: 380px;
+    }
+
+    .cert-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 12px 30px -5px var(--accent-glow), inset 0 0 15px rgba(6, 182, 212, 0.15);
+      transform: translateY(-8px) scale(1.02);
+      animation: liquidWave 3s infinite ease-in-out;
+    }
+
+    @keyframes liquidWave {
+      0%, 100% { border-radius: 16px 16px 16px 16px; }
+      25% { border-radius: 24px 14px 22px 16px; }
+      50% { border-radius: 16px 26px 14px 24px; }
+      75% { border-radius: 22px 16px 24px 14px; }
+    }
+
+    .cert-preview-box {
+      width: 100%; height: 240px; border-radius: 10px; margin-bottom: 1rem;
+      border: 1px solid var(--border); overflow: hidden; background-color: #ffffff;
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
+      position: relative; transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+    
+    .cert-card:hover .cert-preview-box {
+      transform: scale(0.98);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+
+    .cert-preview-img {
+      max-width: 100%; max-height: 100%; object-fit: contain;
+      transition: transform 0.4s ease;
+    }
+    .cert-preview-pdf {
+      width: 100%; height: 100%; border: none; pointer-events: none;
+    }
+
+    .pdf-preview-container {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      padding: 1rem;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .pdf-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #ef4444;
+      color: #ffffff;
+      font-size: 0.7rem;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+      box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+      z-index: 5;
+    }
+
+    .pdf-doc-sheet {
+      width: 70%;
+      height: 80%;
+      background: #ffffff;
+      border-radius: 6px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      position: relative;
+      transition: transform 0.3s ease;
+    }
+
+    .pdf-doc-line {
+      height: 4px;
+      background: #cbd5e1;
+      border-radius: 2px;
+    }
+
+    .pdf-doc-line.title {
+      height: 8px;
+      width: 65%;
+      background: var(--accent);
+      margin-bottom: 4px;
+    }
+
+    .pdf-doc-line.accent-line {
+      height: 3px;
+      width: 45%;
+      background: #0284c7;
+      margin-bottom: 6px;
+    }
+
+    .pdf-seal {
+      position: absolute;
+      bottom: 12px;
+      right: 12px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: rgba(6, 182, 212, 0.15);
+      border: 2px solid var(--accent);
+    }
+    
+    .rotate-cw { transform: rotate(90deg) scale(1.3); }
+    .rotate-ccw { transform: rotate(-90deg) scale(1.3); }
+    .cert-card:hover .rotate-cw { transform: rotate(90deg) scale(1.38); }
+    .cert-card:hover .rotate-ccw { transform: rotate(-90deg) scale(1.38); }
+    .cert-card:hover .cert-preview-img:not(.rotate-cw):not(.rotate-ccw) { transform: scale(1.08); }
+
+    .tags { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+    .tag { background: rgba(6, 182, 212, 0.1); color: var(--accent); font-size: 0.75rem; padding: 0.2rem 0.6rem; border-radius: 4px; border: 1px solid var(--accent); }
+    .card-btn { background: transparent; border: 1px solid var(--accent); color: var(--accent); padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; transition: 0.3s; width: 100%; text-align: center; font-weight: 600; text-decoration: none; display: inline-block; }
+    .card-btn:hover { background: var(--accent); color: #08121e; }
+
+    .contact-container {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start;
+    }
+
+    .contact-form {
+      background: var(--card-bg); padding: 2rem; border-radius: 12px;
+      border: 1px solid var(--border); box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+
+    .form-group { margin-bottom: 1.2rem; }
+    .form-group label { display: block; font-size: 0.9rem; color: var(--text); margin-bottom: 0.4rem; font-weight: 600; }
+    .form-group input, .form-group textarea {
+      width: 100%; padding: 0.8rem 1rem; background: var(--bg-color); border: 1px solid var(--border);
+      border-radius: 6px; color: var(--text); font-size: 0.95rem; outline: none; transition: border-color 0.3s;
+    }
+    .form-group input:focus, .form-group textarea:focus { border-color: var(--accent); box-shadow: 0 0 8px var(--accent-glow); }
+    .form-group textarea { resize: vertical; min-height: 120px; }
+
+    .form-status { margin-top: 1rem; font-size: 0.9rem; font-weight: 600; display: none; padding: 0.8rem; border-radius: 6px; text-align: center; }
+    .form-status.success { color: #10b981; background: rgba(16, 185, 129, 0.15); border: 1px solid #10b981; display: block; }
+    .form-status.error { color: var(--error-color); background: rgba(239, 68, 68, 0.15); border: 1px solid var(--error-color); display: block; }
+
+    .social-links { display: flex; flex-direction: column; gap: 1rem; }
+    .social-links a { color: var(--text); font-size: 1rem; text-decoration: none; padding: 0.8rem 1.5rem; border: 1px solid var(--border); border-radius: 8px; background: var(--card-bg); transition: all 0.3s; display: flex; align-items: center; gap: 0.5rem; }
+    .social-links a:hover { border-color: var(--accent); color: var(--accent); box-shadow: 0 0 15px var(--accent-glow); }
+
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--modal-bg); backdrop-filter: blur(8px); z-index: 2000; align-items: center; justify-content: center; padding: 1.5rem; }
+    .modal-content { background: var(--card-bg); padding: 2rem; border-radius: 12px; max-width: 800px; width: 100%; max-height: 90vh; overflow-y: auto; position: relative; border: 1px solid var(--accent); box-shadow: 0 0 30px var(--accent-glow); animation: modalFade 0.3s ease; display: flex; flex-direction: column; }
+    
+    .cert-modal-content { max-width: 900px; height: 85vh; padding: 1.5rem; display: flex; flex-direction: column; }
+    .cert-viewer-body { flex: 1; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #000; border-radius: 8px; overflow: hidden; margin: 1rem 0; border: 1px solid var(--border); }
+    .cert-viewer-body iframe, .cert-viewer-body img { width: 100%; height: 100%; object-fit: contain; border: none; }
+    
+    .modal-nav { display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 1rem; }
+    .nav-btn { background: var(--sidebar-bg); border: 1px solid var(--accent); color: var(--accent); padding: 0.5rem 1.2rem; border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.3s; }
+    .nav-btn:hover { background: var(--accent); color: #08121e; }
+    
+    @keyframes modalFade { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+    .close-btn { position: absolute; top: 1rem; right: 1rem; font-size: 1.8rem; color: var(--text-muted); cursor: pointer; z-index: 10; }
+    .close-btn:hover { color: var(--accent); }
+
+    footer { text-align: left; padding: 3rem 0 1rem; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 0.9rem; }
+
+    @media (max-width: 850px) {
+      body { flex-direction: column; }
+      aside { width: 100%; height: auto; position: relative; border-right: none; border-bottom: 1px solid var(--border); }
+      main { margin-left: 0; width: 100%; padding: 2rem 1.5rem; }
+      .contact-container { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body data-theme="dark">
+
+  <canvas id="bg-canvas"></canvas>
+
+  <aside>
+    <div class="profile-img-container">
+      <img src="20260718_203836 (1).jpg" alt="Tamirat Gebeyehu Bekele" class="profile-img">
+    </div>
+    <div class="sidebar-name">Tamirat G. Bekele</div>
+    <div class="sidebar-title">Future STEM Major</div>
+    <div class="sidebar-email"><a href="mailto:tamirat.gebe@gmail.com">tamirat.gebe@gmail.com</a></div>
+
+    <ul class="nav-links">
+      <li><a href="#about">About Me</a></li>
+      <li><a href="#education">Education & Focus</a></li>
+      <li><a href="#skills">Technical Skills</a></li>
+      <li><a href="#projects">Featured Projects</a></li>
+      <li><a href="#certificates">Certificates</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+
+    <button class="theme-toggle" onclick="toggleTheme()">
+      <span id="theme-icon">🌙</span> <span id="theme-text">Dark Mode</span>
+    </button>
+  </aside>
+
+  <main>
+    <section class="hero">
+      <h1>Tamirat Gebeyehu Bekele</h1>
+      <h2>High School Graduate | CTE & AI Fundamentals Certified</h2>
+      <p>Integrating AI fundamentals, programming, mathematics, physics, and IT hardware systems into real-world predictive models and modern software solutions.</p>
+      <div class="btn-group">
+        <a href="#certificates" class="btn">View Verified Certificates</a>
+        <a href="#contact" class="btn btn-outline">✉ Send Message</a>
+      </div>
+    </section>
+
+    <section id="about">
+      <h2 class="section-title">About Me</h2>
+      <p style="color: var(--text-muted); font-size: 1.05rem; line-height: 1.8;">
+        As a high school graduate and former Science & Tech Club coordinator, I am passionate about engineering, accessibility, and community impact. Whether co-founding the Simple Learn initiative to produce accessible secondary education content or volunteering with local youth initiatives, I combine my background in web development and many engineering projects with a strong commitment to service, leadership, and continuous learning.
+      </p>
+    </section>
+
+    <section id="education">
+      <h2 class="section-title">Education & Focus</h2>
+      <div class="skills-grid">
+        <div class="skill-card">
+          <h3>Academic Background</h3>
+          <p style="color: var(--text-muted); font-size: 0.95rem;">High school graduate with a strong foundation in mathematics, physics, science, and computer technology.</p>
+        </div>
+        <div class="skill-card">
+          <h3>Career Direction</h3>
+          <p style="color: var(--text-muted); font-size: 0.95rem;">Preparing for a STEM-focused path through practical work in AI, software development, embedded systems, and engineering.</p>
+        </div>
+        <div class="skill-card">
+          <h3>Community Impact</h3>
+          <p style="color: var(--text-muted); font-size: 0.95rem;">Interested in accessible education, youth initiatives, and technology that solves useful community problems.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="skills">
+      <h2 class="section-title">Technical Expertise</h2>
+      <div class="skills-grid">
+        <div class="skill-card">
+          <h3>AI & Software Development</h3>
+          <ul>
+            <li>AI Fundamentals (Udacity Nanodegree)</li>
+            <li>Programming Fundamentals (Python / Core CS)</li>
+            <li>Predictive ML Environmental Models</li>
+            <li>HTML5, CSS3, JavaScript, Java OOP</li>
+          </ul>
+        </div>
+        <div class="skill-card">
+          <h3>IT & Hardware Systems</h3>
+          <ul>
+            <li>Level 1 CTE Computer Maintenance</li>
+            <li>Network Configuration & Setup</li>
+            <li>ESP32 / Arduino Microcontrollers</li>
+            <li>Sensors (DHT11/22, MQ-135 Telemetry)</li>
+          </ul>
+        </div>
+        <div class="skill-card">
+          <h3>Leadership & Mathematics</h3>
+          <ul>
+            <li>Nationwide Maths Competition Winner</li>
+            <li>Sci-Tech Club Coordinator (4 Years)</li>
+            <li>English Club Secretary (4 Years)</li>
+            <li>Data Presentation & Documentation</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="projects">
+      <h2 class="section-title">Featured Projects</h2>
+      
+      <div class="filter-buttons">
+        <button class="filter-btn active" onclick="filterProjects('all')">All</button>
+        <button class="filter-btn" onclick="filterProjects('hardware')">Hardware & AI</button>
+        <button class="filter-btn" onclick="filterProjects('software')">Web & Software</button>
+      </div>
+
+      <div class="projects-grid">
+        <div class="project-card" data-category="hardware">
+          <div>
+            <h3>Standalone Environmental Monitoring Device</h3>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 0.5rem;">Multi-sensor hardware unit evaluating ambient temperature, humidity, and gas concentrations in real time.</p>
+            <div class="tags" style="margin-top: 1rem;"><span class="tag">ESP32/Arduino</span><span class="tag">MQ-135</span><span class="tag">OLED</span></div>
+          </div>
+          <button class="card-btn" onclick="openTextModal('Standalone Environmental IoT Device', 'Built a physical monitoring module using an ESP32/Arduino microcontroller connected to a DHT11/DHT22 sensor, MQ-135 gas sensor, and OLED screen powered via USB bank. Programmed real-time algorithms to continuously output an Air Quality Index (AQI) score.')">View Project Details</button>
+        </div>
+
+        <div class="project-card" data-category="hardware">
+          <div>
+            <h3>Predictive Air Quality ML Model</h3>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 0.5rem;">Applied AI research model forecasting air pollution indices based on environmental data indicators.</p>
+            <div class="tags" style="margin-top: 1rem;"><span class="tag">Machine Learning</span><span class="tag">AI</span><span class="tag">Data Modeling</span></div>
+          </div>
+          <button class="card-btn" onclick="openTextModal('Predictive Air Quality ML Research', 'Engineered a supervised machine learning model using environmental predictors (atmospheric gases, temperature, humidity) to accurately forecast air toxicity trends and localized air quality shifts.')">View Project Details</button>
+        </div>
+
+        <div class="project-card" data-category="software">
+          <div>
+            <h3>Community Management Web App</h3>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 0.5rem;">Full-stack portal serving 25+ paying members with payment logging, meeting schedules, and announcements.</p>
+            <div class="tags" style="margin-top: 1rem;"><span class="tag">HTML5/CSS3</span><span class="tag">JavaScript</span><span class="tag">Java</span></div>
+          </div>
+          <button class="card-btn" onclick="openTextModal('Production Community Web Portal', 'Full-stack community website engineered for 25+ active paying members. Built dynamic monthly payment tracking, an integrated announcement board, and structured meeting schedulers.')">View Project Details</button>
+        </div>
+
+        <div class="project-card" data-category="software">
+          <div>
+            <h3>Interactive Physics Game</h3>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 0.5rem;">Custom software game engine testing fundamental collision physics algorithms and dynamic rendering.</p>
+            <div class="tags" style="margin-top: 1rem;"><span class="tag">Java</span><span class="tag">Algorithms</span><span class="tag">Physics</span></div>
+          </div>
+          <button class="card-btn" onclick="openTextModal('Physics-Based Interactive Game', 'Programmed an interactive 2D game from scratch without high-level commercial engines to master collision physics loops, user key input bindings, and dynamic frame rendering.')">View Project Details</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="certificates">
+      <h2 class="section-title">Certificates & Achievements</h2>
+      <div class="cert-grid">
+
+        <div class="cert-card">
+          <div class="cert-preview-box" onclick="openCertModal(0)">
+            <div class="pdf-preview-container">
+              <span class="pdf-badge">PDF</span>
+              <div class="pdf-doc-sheet">
+                <div class="pdf-doc-line title"></div>
+                <div class="pdf-doc-line accent-line"></div>
+                <div class="pdf-doc-line" style="width: 90%;"></div>
+                <div class="pdf-doc-line" style="width: 80%;"></div>
+                <div class="pdf-doc-line" style="width: 85%;"></div>
+                <div class="pdf-doc-line" style="width: 50%;"></div>
+                <div class="pdf-seal"></div>
+              </div>
+              <iframe src="certificate ai fundamental.pdf#toolbar=0" class="cert-preview-pdf" title="AI Fundamentals Certificate" style="position: absolute; top: 0; left: 0; opacity: 0.9;" onerror="this.style.display='none'"></iframe>
+            </div>
+          </div>
+          <h3>Artificial Intelligence Fundamentals</h3>
+          <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">Udacity (Part of Accenture) • June 2025</p>
+          <button onclick="openCertModal(0)" class="card-btn">View Document</button>
+        </div>
+
+        <div class="cert-card">
+          <div class="cert-preview-box" onclick="openCertModal(1)">
+            <div class="pdf-preview-container">
+              <span class="pdf-badge">PDF</span>
+              <div class="pdf-doc-sheet">
+                <div class="pdf-doc-line title"></div>
+                <div class="pdf-doc-line accent-line"></div>
+                <div class="pdf-doc-line" style="width: 88%;"></div>
+                <div class="pdf-doc-line" style="width: 75%;"></div>
+                <div class="pdf-doc-line" style="width: 92%;"></div>
+                <div class="pdf-doc-line" style="width: 40%;"></div>
+                <div class="pdf-seal"></div>
+              </div>
+              <iframe src="certeficate of programming fundamentals.pdf#toolbar=0" class="cert-preview-pdf" title="Programming Fundamentals Certificate" style="position: absolute; top: 0; left: 0; opacity: 0.9;" onerror="this.style.display='none'"></iframe>
+            </div>
+          </div>
+          <h3>Programming Fundamentals</h3>
+          <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">Udacity & Ministry of Labor and Skills • August 2026</p>
+          <button onclick="openCertModal(1)" class="card-btn">View Document</button>
+        </div>
+
+        <div class="cert-card">
+          <div class="cert-preview-box" onclick="openCertModal(2)">
+            <img src="photo_2026-08-22_23-29-17.jpg" alt="Nationwide Maths Competition Preview" class="cert-preview-img rotate-ccw">
+          </div>
+          <h3>Nationwide Maths Competition</h3>
+          <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">MY Soroban Ethiopia • Advanced Academic Achievement Award</p>
+          <button onclick="openCertModal(2)" class="card-btn">View Document</button>
+        </div>
+
+        <div class="cert-card">
+          <div class="cert-preview-box" onclick="openCertModal(3)">
+            <img src="CTE_Certificate_page-0001.jpg" alt="CTE Certificate Preview" class="cert-preview-img rotate-cw">
+          </div>
+          <h3>Level 1 CTE: Computer Maintenance & Networking</h3>
+          <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">Dilachin General Secondary School (2024/25–2025/26)</p>
+          <button onclick="openCertModal(3)" class="card-btn">View Document</button>
+        </div>
+
+        <div class="cert-card">
+          <div class="cert-preview-box" onclick="openCertModal(4)">
+            <img src="science_and_technology.jpg" alt="Sci-Tech Club Coordinator Preview" class="cert-preview-img">
+          </div>
+          <h3>Science & Technology Club Coordinator</h3>
+          <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">Dilachin Secondary School (Sept 2023–June 2026)</p>
+          <button onclick="openCertModal(4)" class="card-btn">View Document</button>
+        </div>
+
+        <div class="cert-card">
+          <div class="cert-preview-box" onclick="openCertModal(5)">
+            <img src="English_club.jpg" alt="English Club Secretary Preview" class="cert-preview-img">
+          </div>
+          <h3>English Language Club Secretary</h3>
+          <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">Dilachin Secondary School (Sept 2023–June 2026)</p>
+          <button onclick="openCertModal(5)" class="card-btn">View Document</button>
+        </div>
+
+        <div class="cert-card">
+          <div class="cert-preview-box" onclick="openCertModal(6)">
+            <img src="photo_2026-08-22_23-29-11.jpg" alt="Tax Bureau Recognition Certificate Preview" class="cert-preview-img rotate-ccw">
+          </div>
+          <h3>Institutional Recognition Certificate</h3>
+          <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">Addis Ababa City Revenue & Tax Bureau Administration</p>
+          <button onclick="openCertModal(6)" class="card-btn">View Document</button>
+        </div>
+
+        <div class="cert-card">
+          <div class="cert-preview-box" onclick="openCertModal(7)">
+            <img src="photo_2026-08-22_23-29-14.jpg" alt="Grade 8 Honor Certificate Preview" class="cert-preview-img rotate-ccw">
+          </div>
+          <h3>Grade 8 Academic Honor Certificate</h3>
+          <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">Addis Ketema Sub-City Education Office (2014 E.C.)</p>
+          <button onclick="openCertModal(7)" class="card-btn">View Document</button>
+        </div>
+
+      </div>
+    </section>
+
+    <section id="contact">
+      <h2 class="section-title">Get In Touch</h2>
+      <div class="contact-container">
+        
+        <form class="contact-form" id="messageForm" onsubmit="handleFormSubmit(event)">
+          <div class="form-group">
+            <label for="name">Your Name</label>
+            <input type="text" id="name" required placeholder="John Doe">
+          </div>
+          <div class="form-group">
+            <label for="email">Your Email</label>
+            <input type="email" id="email" required placeholder="john@example.com">
+          </div>
+          <div class="form-group">
+            <label for="message">Message</label>
+            <textarea id="message" required placeholder="Hi Tamirat, I'd like to connect regarding..."></textarea>
+          </div>
+          <button type="submit" class="btn" style="width: 100%;">Send Message</button>
+          <div id="formStatus" class="form-status"></div>
+        </form>
+
+        <div class="social-links">
+          <a href="mailto:tamirat.gebe@gmail.com" style="border-color: var(--accent); color: var(--accent);">✉ tamirat.gebe@gmail.com</a>
+          <a href="tel:0970255380">☎ 0970255380</a>
+          <a href="https://github.com" target="_blank">GitHub</a>
+          <a href="https://linkedin.com" target="_blank">LinkedIn</a>
+          <a href="https://t.me/@cocmaxd2" target="_blank">Telegram</a>
+        </div>
+
+      </div>
+    </section>
+
+    <footer>
+      <p>&copy; 2026 Tamirat Gebeyehu Bekele. Academic Portfolio.</p>
+    </footer>
+  </main>
+
+  <!-- Project Info Modal -->
+  <div class="modal" id="infoModal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal('infoModal')">&times;</span>
+      <h3 id="modalTitle" style="color: var(--accent); margin-bottom: 0.5rem;"></h3>
+      <p id="modalDescription" style="color: var(--text-muted); font-size: 1rem;"></p>
+    </div>
+  </div>
+
+  <!-- Interactive Document Viewer Modal -->
+  <div class="modal" id="certModal">
+    <div class="modal-content cert-modal-content">
+      <span class="close-btn" onclick="closeModal('certModal')">&times;</span>
+      <h3 id="certModalTitle" style="color: var(--accent); margin-bottom: 0.2rem;"></h3>
+      <p id="certModalSubtitle" style="color: var(--text-muted); font-size: 0.85rem;"></p>
+      
+      <div class="cert-viewer-body" id="certViewerContainer">
+        <!-- Rendered via JS -->
+      </div>
+
+      <div class="modal-nav">
+        <button class="nav-btn" onclick="navigateCert(-1)">&larr; Previous</button>
+        <a id="certDirectLink" href="#" target="_blank" style="color: var(--accent); font-size: 0.85rem; text-decoration: none; font-weight: 600;">Open Original File ↗</a>
+        <button class="nav-btn" onclick="navigateCert(1)">Next &rarr;</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const certsData = [
+      { title: "Artificial Intelligence Fundamentals", sub: "Udacity (Part of Accenture) • June 2025", file: "certificate ai fundamental.pdf", type: "pdf", rotate: "" },
+      { title: "Programming Fundamentals", sub: "Udacity & Ministry of Labor and Skills • August 2026", file: "certeficate of programming fundamentals.pdf", type: "pdf", rotate: "" },
+      { title: "Nationwide Maths Competition", sub: "MY Soroban Ethiopia • Advanced Academic Achievement Award", file: "photo_2026-08-22_23-29-17.jpg", type: "img", rotate: "rotate-ccw" },
+      { title: "Level 1 CTE: Computer Maintenance & Networking", sub: "Dilachin General Secondary School (2024/25–2025/26)", file: "CTE_Certificate_page-0001.jpg", type: "img", rotate: "rotate-cw" },
+      { title: "Science & Technology Club Coordinator", sub: "Dilachin Secondary School (Sept 2023–June 2026)", file: "science_and_technology.jpg", type: "img", rotate: "" },
+      { title: "English Language Club Secretary", sub: "Dilachin Secondary School (Sept 2023–June 2026)", file: "English_club.jpg", type: "img", rotate: "" },
+      { title: "Institutional Recognition Certificate", sub: "Addis Ababa City Revenue & Tax Bureau Administration", file: "photo_2026-08-22_23-29-11.jpg", type: "img", rotate: "rotate-ccw" },
+      { title: "Grade 8 Academic Honor Certificate", sub: "Addis Ketema Sub-City Education Office (2014 E.C.)", file: "photo_2026-08-22_23-29-14.jpg", type: "img", rotate: "rotate-ccw" }
+    ];
+
+    let currentCertIdx = 0;
+
+    // Liquid Tracking Cursor Effect for Certificates
+    document.querySelectorAll('.cert-card').forEach(card => {
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        card.style.setProperty('--mouse-x', `${x}px`);
+        card.style.setProperty('--mouse-y', `${y}px`);
+      });
+    });
+
+    async function handleFormSubmit(event) {
+      event.preventDefault();
+
+      const status = document.getElementById('formStatus');
+      const submitBtn = event.target.querySelector('button[type="submit"]');
+      
+      const payload = {
+        name: document.getElementById('name').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        message: document.getElementById('message').value.trim()
+      };
+
+      try {
+        submitBtn.disabled = true;
+        submitBtn.innerText = 'Sending...';
+
+        const response = await fetch('/api/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.status === 'success') {
+          status.innerText = '✓ Thank you! Your message has been sent successfully.';
+          status.className = 'form-status success';
+          document.getElementById('messageForm').reset();
+        } else {
+          throw new Error(data.message || 'Submission failed.');
+        }
+      } catch (err) {
+        console.error('Submission Error:', err);
+        status.innerText = 'Could not send message. Please make sure your backend server is running on port 5000.';
+        status.className = 'form-status error';
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerText = 'Send Message';
+      }
+    }
+
+    function openCertModal(index) {
+      currentCertIdx = index;
+      renderCertModal();
+      document.getElementById('certModal').style.display = 'flex';
+    }
+
+    function renderCertModal() {
+      const item = certsData[currentCertIdx];
+      document.getElementById('certModalTitle').innerText = item.title;
+      document.getElementById('certModalSubtitle').innerText = item.sub;
+      document.getElementById('certDirectLink').href = item.file;
+
+      const container = document.getElementById('certViewerContainer');
+      if (item.type === 'pdf') {
+        container.innerHTML = `
+          <div style="width: 100%; height: 100%; position: relative; background: #0f172a; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <object data="${item.file}" type="application/pdf" width="100%" height="100%">
+              <iframe src="${item.file}" style="width: 100%; height: 100%; border: none;">
+                <div style="padding: 2rem; text-align: center; color: #f8fafc;">
+                  <div style="font-size: 3rem; margin-bottom: 1rem;">📄</div>
+                  <h4 style="font-size: 1.2rem; color: var(--accent); margin-bottom: 0.5rem;">${item.title}</h4>
+                  <p style="color: var(--text-muted); margin-bottom: 1.5rem;">${item.sub}</p>
+                  <a href="${item.file}" target="_blank" class="btn">Open Original PDF File ↗</a>
+                </div>
+              </iframe>
+            </object>
+          </div>`;
+      } else {
+        container.innerHTML = `<img src="${item.file}" class="${item.rotate}" alt="${item.title}">`;
+      }
+    }
+
+    function navigateCert(direction) {
+      currentCertIdx += direction;
+      if (currentCertIdx < 0) currentCertIdx = certsData.length - 1;
+      if (currentCertIdx >= certsData.length) currentCertIdx = 0;
+      renderCertModal();
+    }
+
+    function toggleTheme() {
+      const body = document.body;
+      const themeIcon = document.getElementById('theme-icon');
+      const themeText = document.getElementById('theme-text');
+      
+      if (body.getAttribute('data-theme') === 'dark') {
+        body.setAttribute('data-theme', 'light');
+        themeIcon.innerText = '☀️';
+        themeText.innerText = 'Light Mode';
+      } else {
+        body.setAttribute('data-theme', 'dark');
+        themeIcon.innerText = '🌙';
+        themeText.innerText = 'Dark Mode';
+      }
+    }
+
+    function filterProjects(category) {
+      const cards = document.querySelectorAll('.project-card');
+      const buttons = document.querySelectorAll('.filter-btn');
+      
+      buttons.forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+
+      cards.forEach(card => {
+        if (category === 'all' || card.dataset.category === category) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    function openTextModal(title, desc) {
+      document.getElementById('modalTitle').innerText = title;
+      document.getElementById('modalDescription').innerText = desc;
+      document.getElementById('infoModal').style.display = 'flex';
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+      if (event.target.classList.contains('modal')) {
+        event.target.style.display = 'none';
+      }
+    }
+
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    const pointer = { x: null, y: null, radius: 180 };
+    const connectionDistance = 145;
+
+    function resizeCanvas() {
+      const ratio = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = window.innerWidth * ratio;
+      canvas.height = window.innerHeight * ratio;
+      canvas.style.width = `${window.innerWidth}px`;
+      canvas.style.height = `${window.innerHeight}px`;
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    }
+    window.addEventListener('resize', resizeCanvas);
+    window.addEventListener('mousemove', event => {
+      pointer.x = event.clientX;
+      pointer.y = event.clientY;
+    });
+    window.addEventListener('mouseleave', () => {
+      pointer.x = null;
+      pointer.y = null;
+    });
+    resizeCanvas();
+
+    class Particle {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 1.8 + 0.8;
+        this.speedX = (Math.random() - 0.5) * 0.35;
+        this.speedY = (Math.random() - 0.5) * 0.35;
+        this.baseAlpha = Math.random() * 0.45 + 0.25;
+      }
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+        if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+      }
+      draw(accent) {
+        const distanceToPointer = pointer.x === null ? Infinity : Math.hypot(this.x - pointer.x, this.y - pointer.y);
+        const glow = Math.max(0, 1 - distanceToPointer / pointer.radius);
+        ctx.fillStyle = accent;
+        ctx.globalAlpha = this.baseAlpha + glow * 0.45;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size + glow * 2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    for (let i = 0; i < 58; i++) {
+      particles.push(new Particle());
+    }
+
+    function animate() {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach((particle, index) => {
+        if (pointer.x !== null) {
+          const distance = Math.hypot(particle.x - pointer.x, particle.y - pointer.y);
+          if (distance < pointer.radius && distance > 1) {
+            particle.x += (particle.x - pointer.x) / distance * 0.22;
+            particle.y += (particle.y - pointer.y) / distance * 0.22;
+          }
+        }
+        particle.x = (particle.x + width) % width;
+        particle.y = (particle.y + height) % height;
+        particle.update();
+        particle.draw(accent);
+        for (let nextIndex = index + 1; nextIndex < particles.length; nextIndex++) {
+          const next = particles[nextIndex];
+          const distance = Math.hypot(particle.x - next.x, particle.y - next.y);
+          if (distance < connectionDistance) {
+            ctx.strokeStyle = accent;
+            ctx.globalAlpha = (1 - distance / connectionDistance) * 0.16;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(particle.x, particle.y);
+            ctx.lineTo(next.x, next.y);
+            ctx.stroke();
+          }
+        }
+      });
+      if (pointer.x !== null) {
+        const glow = ctx.createRadialGradient(pointer.x, pointer.y, 0, pointer.x, pointer.y, pointer.radius);
+        glow.addColorStop(0, 'rgba(6, 182, 212, 0.14)');
+        glow.addColorStop(1, 'rgba(6, 182, 212, 0)');
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = glow;
+        ctx.beginPath();
+        ctx.arc(pointer.x, pointer.y, pointer.radius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+      requestAnimationFrame(animate);
+    }
+    animate();
+  </script>
+</body>
+</html>
